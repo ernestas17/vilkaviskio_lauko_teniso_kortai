@@ -1,0 +1,36 @@
+// Prisma schema for the tennis court reservation system.
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// There is a single court, so reservations stand alone — no Court model.
+model Reservation {
+  id              Int      @id @default(autoincrement())
+  customerName    String
+  customerSurname String
+  email           String
+  phone           String
+  date            DateTime // day of the reservation (time component is ignored)
+  startHour       Int // hour the slot begins, 0–23
+  endHour         Int // hour the slot ends, 1–24 (exclusive upper bound)
+  confirmed       Boolean  @default(false) // becomes true when the confirm link is clicked
+  cancelled       Boolean  @default(false) // becomes true when the cancel link is clicked
+  token           String   @unique // token used in the confirm / cancel links
+  createdAt       DateTime @default(now())
+
+  @@index([date])
+}
+
+// Administrator account (email + bcrypt-hashed password).
+model Admin {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String // bcrypt hash
+  createdAt DateTime @default(now())
+}
