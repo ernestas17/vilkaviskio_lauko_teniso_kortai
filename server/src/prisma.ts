@@ -1,11 +1,18 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 
 // Prisma 7 connects at runtime through a driver adapter rather than a `url`
-// in schema.prisma. The path is resolved relative to process.cwd() (server/).
-const adapter = new PrismaBetterSqlite3({
-  url: process.env.DATABASE_URL ?? "file:./prisma/dev.db",
-});
+// in schema.prisma. The MariaDB adapter talks to the MySQL server in DATABASE_URL.
+//
+// `allowPublicKeyRetrieval` is required for MySQL's caching_sha2_password auth
+// over a non-TLS connection — without it the handshake fails ("RSA public key
+// is not available client side") and connections time out.
+const url = process.env.DATABASE_URL ?? "";
+const databaseUrl = url.includes("allowPublicKeyRetrieval")
+  ? url
+  : url + (url.includes("?") ? "&" : "?") + "allowPublicKeyRetrieval=true";
+
+const adapter = new PrismaMariaDb(databaseUrl);
 
 // Single shared Prisma client instance for the whole app.
 export const prisma = new PrismaClient({ adapter });

@@ -30,23 +30,27 @@ export async function verifyCredentials(
   return ok ? admin.email : null;
 }
 
+// In production the client and API are on different origins, so the session
+// cookie must be SameSite=None + Secure to be sent cross-site.
+const isProd = process.env.NODE_ENV === "production";
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: (isProd ? "none" : "lax") as "none" | "lax",
+  secure: isProd,
+  path: "/",
+};
+
 // Signs a JWT and sets it as an httpOnly cookie on the response.
 export function issueAdminCookie(res: Response, email: string): void {
   const token = jwt.sign({ role: "admin" } satisfies Omit<AdminPayload, "sub">, getSecret(), {
     subject: email,
     expiresIn: TOKEN_TTL,
   });
-  res.cookie(COOKIE_NAME, token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    maxAge: COOKIE_MAX_AGE,
-    path: "/",
-  });
+  res.cookie(COOKIE_NAME, token, { ...cookieOptions, maxAge: COOKIE_MAX_AGE });
 }
 
 export function clearAdminCookie(res: Response): void {
-  res.clearCookie(COOKIE_NAME, { path: "/" });
+  res.clearCookie(COOKIE_NAME, cookieOptions);
 }
 
 // Express middleware: allow only requests carrying a valid admin JWT cookie.

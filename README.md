@@ -4,8 +4,8 @@ Online booking system for the single public outdoor tennis court in Vilkaviškis
 Visitors reserve a 2‑hour slot and **confirm or cancel by email link**; an admin
 manages all reservations from a protected dashboard.
 
-- **server/** — Express REST API (TypeScript) with Prisma 7 (SQLite via the
-  better‑sqlite3 driver adapter), Nodemailer email, and JWT cookie admin auth.
+- **server/** — Express REST API (TypeScript) with Prisma 7 (MySQL via the
+  MariaDB driver adapter), Nodemailer email, and JWT cookie admin auth.
 - **client/** — React + TypeScript SPA (Vite, React Router, Tailwind CSS v4,
   shadcn/ui).
 
@@ -36,12 +36,16 @@ manages all reservations from a protected dashboard.
 ```bash
 cd server
 npm install
-cp .env.example .env       # then edit values (see below) — or create .env
-npm run prisma:migrate     # create the SQLite database + tables
-npm run admin:create       # create the admin account from ADMIN_EMAIL/ADMIN_PASSWORD
-npm run seed               # (optional) add a couple of sample reservations
-npm run dev                # http://localhost:4000  (tsx watch — no build step)
+cp .env.example .env        # then edit values (see below) — or create .env
+npx prisma migrate deploy   # apply migrations (create the tables) on the MySQL DB
+npm run admin:create        # create the admin account from ADMIN_EMAIL/ADMIN_PASSWORD
+npm run seed                # (optional) add a couple of sample reservations
+npm run dev                 # http://localhost:4000  (tsx watch — no build step)
 ```
+
+Use `prisma migrate deploy` against the hosted MySQL database. `npm run
+prisma:migrate` (`prisma migrate dev`) is for local development only — it needs
+shadow‑database privileges that shared MySQL hosts usually don't grant.
 
 Other scripts: `npm run build` (compile TS → `dist/`), `npm start` (run the
 compiled output), `npm run typecheck`, `npm run prisma:studio`.
@@ -51,7 +55,7 @@ compiled output), `npm run typecheck`, `npm run prisma:studio`.
 | Variable              | Purpose                                                             |
 | --------------------- | ------------------------------------------------------------------- |
 | `PORT`                | API port (default 4000)                                             |
-| `DATABASE_URL`        | SQLite path, **relative to `server/`** — e.g. `file:./prisma/dev.db`|
+| `DATABASE_URL`        | MySQL connection string, e.g. `mysql://user:pass@host:3306/db` (URL-encode special chars in the password) |
 | `CLIENT_BASE_URL`     | Public URL of the client app; used to build email confirm/cancel links |
 | `SMTP_HOST/PORT/USER/PASS` | SMTP server (port 465 = implicit TLS, otherwise STARTTLS)      |
 | `MAIL_FROM`           | "From" header, e.g. `Vilkaviškio lauko teniso kortai <no-reply@…>`  |

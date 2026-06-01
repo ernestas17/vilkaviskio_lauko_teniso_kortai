@@ -1,5 +1,9 @@
-// Thin wrapper around the reservation API. Requests are proxied to the
-// Express server via Vite's dev proxy (see vite.config.ts).
+// Thin wrapper around the reservation API.
+//
+// In production set VITE_API_URL to the deployed API base (e.g.
+// "https://white-ostrich-337999.hostingersite.com/api") so calls go straight to
+// the backend. In development it falls back to "/api", which the Vite dev proxy
+// forwards to the Express server (see vite.config.ts).
 
 import type {
   AdminReservation,
@@ -9,7 +13,7 @@ import type {
   ReservationActionResult,
 } from "./types";
 
-const BASE = "/api";
+const BASE = (import.meta.env.VITE_API_URL ?? "/api").replace(/\/$/, "");
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {

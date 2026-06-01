@@ -9,10 +9,36 @@ import cookieParser from "cookie-parser";
 import reservationsRouter from "./routes/reservations.js";
 import adminRouter from "./routes/admin.js";
 
+// Origins allowed to make credentialed (cookie) requests. Includes the prod
+// client, local dev/preview, plus anything from CLIENT_BASE_URL / CORS_ORIGINS.
+const allowedOrigins = new Set(
+  [
+    process.env.CLIENT_BASE_URL,
+    ...(process.env.CORS_ORIGINS?.split(",") ?? []),
+    "https://vilkaviskiolaukotenisokortai.lt",
+    "http://localhost:5173",
+    "http://localhost:4173",
+  ]
+    .map((o) => o?.trim())
+    .filter((o): o is string => Boolean(o)),
+);
+
 export function createApp(): Express {
   const app = express();
 
-  app.use(cors());
+  app.use(
+    cors({
+      origin(
+        origin: string | undefined,
+        callback: (err: Error | null, allow?: boolean) => void,
+      ) {
+        // Allow non-browser clients (no Origin) and allowlisted origins.
+        if (!origin || allowedOrigins.has(origin)) callback(null, true);
+        else callback(null, false);
+      },
+      credentials: true,
+    }),
+  );
   app.use(express.json());
   app.use(cookieParser());
 
