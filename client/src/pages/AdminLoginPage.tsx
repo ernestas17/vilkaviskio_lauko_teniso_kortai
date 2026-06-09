@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { adminApi } from "@/api";
@@ -14,6 +14,18 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const checked = useRef(false);
+
+  // Already logged in? Skip the form and go straight to the dashboard.
+  useEffect(() => {
+    if (checked.current) return;
+    checked.current = true;
+    adminApi
+      .me()
+      .then(() => navigate("/admin", { replace: true }))
+      .catch(() => setChecking(false));
+  }, [navigate]);
 
   async function handleSubmit(e: FormEvent): Promise<void> {
     e.preventDefault();
@@ -21,12 +33,20 @@ export default function AdminLoginPage() {
     setLoading(true);
     try {
       await adminApi.login(email, password);
-      navigate("/admin");
+      navigate("/admin", { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Nepavyko prisijungti.");
     } finally {
       setLoading(false);
     }
+  }
+
+  if (checking) {
+    return (
+      <div className="flex justify-center py-24">
+        <div className="size-8 animate-spin rounded-full border-2 border-muted border-t-primary" />
+      </div>
+    );
   }
 
   return (
