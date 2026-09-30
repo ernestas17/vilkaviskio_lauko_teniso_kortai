@@ -115,7 +115,8 @@ The Vite dev server proxies `/api/*` to the Express server on port 4000.
   confirm/cancel links), `createdAt`.
 - **Admin** — unique `email`, bcrypt‑hashed `password`, `createdAt`.
 
-Time slots are fixed 2‑hour blocks from 08:00 to 22:00.
+Time slots are fixed blocks from 08:00 to 22:00: 2‑hour blocks from 09:00 to
+21:00, plus 1‑hour blocks at 08:00–09:00 and 21:00–22:00.
 
 ## Notes & production
 

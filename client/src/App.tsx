@@ -32,13 +32,14 @@ interface TimeSlot {
 }
 
 const TIME_SLOTS: TimeSlot[] = [
-  { label: "08:00 - 10:00", startHour: 8, endHour: 10 },
-  { label: "10:00 - 12:00", startHour: 10, endHour: 12 },
-  { label: "12:00 - 14:00", startHour: 12, endHour: 14 },
-  { label: "14:00 - 16:00", startHour: 14, endHour: 16 },
-  { label: "16:00 - 18:00", startHour: 16, endHour: 18 },
-  { label: "18:00 - 20:00", startHour: 18, endHour: 20 },
-  { label: "20:00 - 22:00", startHour: 20, endHour: 22 },
+  { label: "08:00 - 09:00", startHour: 8, endHour: 9 },
+  { label: "09:00 - 11:00", startHour: 9, endHour: 11 },
+  { label: "11:00 - 13:00", startHour: 11, endHour: 13 },
+  { label: "13:00 - 15:00", startHour: 13, endHour: 15 },
+  { label: "15:00 - 17:00", startHour: 15, endHour: 17 },
+  { label: "17:00 - 19:00", startHour: 17, endHour: 19 },
+  { label: "19:00 - 21:00", startHour: 19, endHour: 21 },
+  { label: "21:00 - 22:00", startHour: 21, endHour: 22 },
 ];
 
 const TOTAL_STEPS = 2;
